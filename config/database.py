@@ -12,7 +12,6 @@ Base = declarative_base()
 
 
 def get_db():
-    """Dependencia para obtener la sesión de base de datos"""
     db = SessionLocal()
     try:
         yield db
@@ -21,5 +20,4 @@ def get_db():
 
 
 def create_tables():
-    """Crea todas las tablas en la base de datos"""
     Base.metadata.create_all(bind=engine)

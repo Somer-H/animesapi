@@ -6,7 +6,6 @@ class AnimeRepository:
     
     @staticmethod
     def create(db: Session, titulo: str, genero: str, año: int, descripcion: str) -> Anime:
-        """Crea un nuevo anime"""
         anime = Anime(
             titulo=titulo,
             genero=genero,

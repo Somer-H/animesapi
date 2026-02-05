@@ -23,7 +23,6 @@ def get_anime(
     db: Session = Depends(get_db),
     payload: dict = Depends(verify_token)
 ):
-    """Obtiene un anime por ID (requiere autenticación)"""
     return AnimeService.get_anime_by_id(db, anime_id)
 
 
@@ -34,7 +33,6 @@ def get_all_animes(
     limit: int = 10,
     payload: dict = Depends(verify_token)
 ):
-    """Obtiene todos los animes (requiere autenticación)"""
     return AnimeService.get_all_animes(db, skip, limit)
 
 
@@ -45,7 +43,6 @@ def update_anime(
     db: Session = Depends(get_db),
     payload: dict = Depends(verify_token)
 ):
-    """Actualiza un anime (requiere autenticación)"""
     return AnimeService.update_anime(db, anime_id, anime_update)
 
 
@@ -55,5 +52,4 @@ def delete_anime(
     db: Session = Depends(get_db),
     payload: dict = Depends(verify_token)
 ):
-    """Elimina un anime (requiere autenticación)"""
     return AnimeService.delete_anime(db, anime_id)

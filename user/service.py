@@ -6,12 +6,9 @@ from security.auth import hash_password, verify_password
 
 
 class UserService:
-    """Servicio de negocio para Usuario"""
     
     @staticmethod
     def create_user(db: Session, user_create: UserCreate):
-        """Crea un nuevo usuario después de validar que no exista"""
-        # Verificar si el usuario ya existe
         existing_user = UserRepository.get_by_username(db, user_create.username)
         if existing_user:
             raise HTTPException(
@@ -19,7 +16,6 @@ class UserService:
                 detail="El usuario ya existe"
             )
         
-        # Verificar si el email ya existe
         existing_email = UserRepository.get_by_email(db, user_create.email)
         if existing_email:
             raise HTTPException(
@@ -27,10 +23,8 @@ class UserService:
                 detail="El email ya está registrado"
             )
         
-        # Encriptar contraseña
         hashed_password = hash_password(user_create.password)
         
-        # Crear usuario
         return UserRepository.create(
             db,
             username=user_create.username,

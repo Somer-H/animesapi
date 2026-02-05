@@ -5,12 +5,9 @@ from anime.schemas import AnimeCreate, AnimeUpdate
 
 
 class AnimeService:
-    """Servicio de negocio para Anime"""
     
     @staticmethod
     def create_anime(db: Session, anime_create: AnimeCreate):
-        """Crea un nuevo anime"""
-        # Verificar si ya existe un anime con el mismo título
         existing_anime = AnimeRepository.get_by_titulo(db, anime_create.titulo)
         if existing_anime:
             raise HTTPException(
@@ -28,7 +25,6 @@ class AnimeService:
     
     @staticmethod
     def get_anime_by_id(db: Session, anime_id: int):
-        """Obtiene un anime por ID"""
         anime = AnimeRepository.get_by_id(db, anime_id)
         
         if not anime:
@@ -41,12 +37,10 @@ class AnimeService:
     
     @staticmethod
     def get_all_animes(db: Session, skip: int = 0, limit: int = 10):
-        """Obtiene todos los animes"""
         return AnimeRepository.get_all(db, skip, limit)
     
     @staticmethod
     def update_anime(db: Session, anime_id: int, anime_update: AnimeUpdate):
-        """Actualiza un anime"""
         anime = AnimeRepository.get_by_id(db, anime_id)
         
         if not anime:
@@ -60,7 +54,6 @@ class AnimeService:
     
     @staticmethod
     def delete_anime(db: Session, anime_id: int):
-        """Elimina un anime"""
         success = AnimeRepository.delete(db, anime_id)
         
         if not success:
