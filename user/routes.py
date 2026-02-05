@@ -10,10 +10,23 @@ from security.auth import create_access_token, verify_token
 router = APIRouter(prefix="/api/users", tags=["users"])
 
 
-@router.post("/register", response_model=UserResponse)
-def register(user_create: UserCreate, db: Session = Depends(get_db)):
+@router.post("/register", response_model=TokenResponse)
+def register(user_create: UserCreate, response: Response, db: Session = Depends(get_db)):
     user = UserService.create_user(db, user_create)
-    return user
+
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": str(user.id)},
+        expires_delta=access_token_expires
+    )
+
+    response.headers["Authorization"] = f"Bearer {access_token}"
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": user
+    }
 
 
 @router.post("/login", response_model=TokenResponse)
