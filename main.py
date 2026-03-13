@@ -2,6 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from user.routes import router as user_router
 from anime.routes import router as anime_router
+from watchlist.routes import router as watchlist_router
+from news.routes import router as news_router
+from config.database import create_tables
+import user.models, anime.models, watchlist.models, news.models
 
 app = FastAPI(
     title="API Usuarios y Animes",
@@ -20,6 +24,10 @@ app.add_middleware(
 
 app.include_router(user_router)
 app.include_router(anime_router)
+app.include_router(watchlist_router)
+app.include_router(news_router)
+
+create_tables()
 
 
 @app.get("/")
