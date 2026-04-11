@@ -5,10 +5,7 @@ from dotenv import load_dotenv
 # Cargar variables de entorno
 load_dotenv()
 
-# Configuración de la base de datos desde URL (mysql+pymysql://user:pass@host:port/db)
 db_url = os.getenv("DATABASE_URL")
-# Parsear la URL (muy básico)
-# mysql+pymysql://somer:140823schmesom1917@anime.crq4swmsoc3a.us-east-1.rds.amazonaws.com:3306/animes
 parts = db_url.replace("mysql+pymysql://", "").replace("@", ":").replace("/", ":").split(":")
 user = parts[0]
 password = parts[1]
