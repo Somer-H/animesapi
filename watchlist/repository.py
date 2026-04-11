@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from watchlist.models import Watchlist
 
 
@@ -23,7 +23,7 @@ class WatchlistRepository:
     
     @staticmethod
     def get_user_watchlist(db: Session, user_id: int) -> list:
-        return db.query(Watchlist).filter(Watchlist.user_id == user_id).all()
+        return db.query(Watchlist).options(joinedload(Watchlist.anime)).filter(Watchlist.user_id == user_id).all()
 
     @staticmethod
     def remove(db: Session, user_id: int, anime_id: int) -> bool:

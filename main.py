@@ -5,6 +5,7 @@ from anime.routes import router as anime_router
 from watchlist.routes import router as watchlist_router
 from config.database import create_tables
 import user.models, anime.models, watchlist.models
+import config.cloudinary_config
 
 app = FastAPI(
     title="API Usuarios y Animes",

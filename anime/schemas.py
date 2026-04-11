@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
 
 class AnimeCreate(BaseModel):
@@ -7,6 +8,7 @@ class AnimeCreate(BaseModel):
     genero: str
     año: int
     descripcion: str
+    image_url: Optional[str] = None
 
 
 class AnimeUpdate(BaseModel):
@@ -14,6 +16,7 @@ class AnimeUpdate(BaseModel):
     genero: str = None
     año: int = None
     descripcion: str = None
+    image_url: Optional[str] = None
 
 
 class AnimeResponse(BaseModel):
@@ -22,6 +25,7 @@ class AnimeResponse(BaseModel):
     genero: str
     año: int
     descripcion: str
+    image_url: Optional[str]
     created_at: datetime
     
     class Config:

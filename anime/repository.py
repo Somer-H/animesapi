@@ -5,12 +5,13 @@ from anime.models import Anime
 class AnimeRepository:
     
     @staticmethod
-    def create(db: Session, titulo: str, genero: str, año: int, descripcion: str) -> Anime:
+    def create(db: Session, titulo: str, genero: str, año: int, descripcion: str, image_url: str = None) -> Anime:
         anime = Anime(
             titulo=titulo,
             genero=genero,
             año=año,
-            descripcion=descripcion
+            descripcion=descripcion,
+            image_url=image_url
         )
         db.add(anime)
         db.commit()

@@ -11,4 +11,5 @@ class Anime(Base):
     genero = Column(String(50), nullable=False)
     año = Column(Integer, nullable=False)
     descripcion = Column(String(500), nullable=False)
+    image_url = Column(String(500), nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

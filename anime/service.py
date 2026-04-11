@@ -20,7 +20,8 @@ class AnimeService:
             titulo=anime_create.titulo,
             genero=anime_create.genero,
             año=anime_create.año,
-            descripcion=anime_create.descripcion
+            descripcion=anime_create.descripcion,
+            image_url=anime_create.image_url
         )
     
     @staticmethod

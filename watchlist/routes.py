@@ -24,6 +24,11 @@ def get_my_watchlist(db: Session = Depends(get_db), payload: dict = Depends(veri
     return WatchlistService.get_my_list(db, user_id)
 
 
+@router.get("/user/{user_id}", response_model=list[WatchlistResponse])
+def get_user_watchlist(user_id: int, db: Session = Depends(get_db)):
+    return WatchlistService.get_my_list(db, user_id)
+
+
 @router.delete("/{anime_id}")
 def remove_from_watchlist(
     anime_id: int, 
