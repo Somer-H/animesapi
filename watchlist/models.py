@@ -13,5 +13,5 @@ class Watchlist(Base):
     estado = Column(String(50), nullable=False) # 'viendo', 'completado', 'por_ver'
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
-    anime = relationship("Anime")
+    anime = relationship("Anime", back_populates="watchlist_entries")
     user = relationship("User", back_populates="watchlist")
