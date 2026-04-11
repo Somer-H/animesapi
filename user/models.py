@@ -14,3 +14,4 @@ class User(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     watchlist = relationship("Watchlist", back_populates="user")
+    animes = relationship("Anime", back_populates="owner")

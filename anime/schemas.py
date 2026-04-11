@@ -26,6 +26,7 @@ class AnimeResponse(BaseModel):
     año: int
     descripcion: str
     image_url: Optional[str]
+    user_id: int
     created_at: datetime
     
     class Config:

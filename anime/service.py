@@ -7,7 +7,7 @@ from anime.schemas import AnimeCreate, AnimeUpdate
 class AnimeService:
     
     @staticmethod
-    def create_anime(db: Session, anime_create: AnimeCreate):
+    def create_anime(db: Session, anime_create: AnimeCreate, user_id: int):
         existing_anime = AnimeRepository.get_by_titulo(db, anime_create.titulo)
         if existing_anime:
             raise HTTPException(
@@ -21,7 +21,8 @@ class AnimeService:
             genero=anime_create.genero,
             año=anime_create.año,
             descripcion=anime_create.descripcion,
-            image_url=anime_create.image_url
+            image_url=anime_create.image_url,
+            user_id=user_id
         )
     
     @staticmethod

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 from config.database import Base
@@ -13,7 +13,9 @@ class Anime(Base):
     año = Column(Integer, nullable=False)
     descripcion = Column(String(500), nullable=False)
     image_url = Column(String(500), nullable=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
-    # Relación con Watchlist con borrado en cascada
+    # Relaciones
     watchlist_entries = relationship("Watchlist", back_populates="anime", cascade="all, delete-orphan")
+    owner = relationship("User", back_populates="animes")

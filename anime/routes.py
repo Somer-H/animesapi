@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, status
 from sqlalchemy.orm import Session
 from config.database import get_db
 from anime.schemas import AnimeCreate, AnimeUpdate, AnimeResponse
@@ -16,7 +16,8 @@ def create_anime(
     db: Session = Depends(get_db),
     payload: dict = Depends(verify_token)
 ):
-    return AnimeService.create_anime(db, anime_create)
+    user_id = payload.get("sub")
+    return AnimeService.create_anime(db, anime_create, user_id)
 
 
 @router.get("/{anime_id}", response_model=AnimeResponse)
@@ -45,6 +46,15 @@ def update_anime(
     db: Session = Depends(get_db),
     payload: dict = Depends(verify_token)
 ):
+    user_id = payload.get("sub")
+    anime = AnimeService.get_anime_by_id(db, anime_id)
+    
+    if anime.user_id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permiso para editar este anime"
+        )
+        
     return AnimeService.update_anime(db, anime_id, anime_update)
 
 
@@ -54,6 +64,15 @@ def delete_anime(
     db: Session = Depends(get_db),
     payload: dict = Depends(verify_token)
 ):
+    user_id = payload.get("sub")
+    anime = AnimeService.get_anime_by_id(db, anime_id)
+    
+    if anime.user_id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permiso para eliminar este anime"
+        )
+        
     return AnimeService.delete_anime(db, anime_id)
 
 
@@ -64,8 +83,15 @@ def upload_anime_image(
     db: Session = Depends(get_db),
     payload: dict = Depends(verify_token)
 ):
-    # Obtener el anime para verificar que existe
+    user_id = payload.get("sub")
+    # Obtener el anime para verificar que existe y es el dueño
     anime = AnimeService.get_anime_by_id(db, anime_id)
+    
+    if anime.user_id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permiso para subir imágenes a este anime"
+        )
     
     # Subir a Cloudinary
     upload_result = cloudinary.uploader.upload(file.file)
