@@ -38,11 +38,18 @@ def send_push_notification(fcm_tokens: list[str], title: str, body: str, data: d
             cred = credentials.Certificate(cred_path)
             firebase_admin.initialize_app(cred)
 
-        # Construir el mensaje multicast
+        # Construir el mensaje multicast usando solo DATA para manejo personalizado en Android
+        # Esto permite que onMessageReceived se ejecute siempre, incluso en background
+        payload = {
+            "titulo": title,
+            "cuerpo": body
+        }
+        if data:
+            payload.update({k: str(v) for k, v in data.items()})
+
         message = messaging.MulticastMessage(
             tokens=fcm_tokens,
-            notification=messaging.Notification(title=title, body=body),
-            data={k: str(v) for k, v in (data or {}).items()},
+            data=payload,
             android=messaging.AndroidConfig(priority="high")
         )
         response = messaging.send_each_for_multicast(message)
