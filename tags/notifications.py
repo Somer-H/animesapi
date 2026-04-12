@@ -44,11 +44,16 @@ def send_push_notification(fcm_tokens: list[str], title: str, body: str, data: d
             "titulo": title,
             "cuerpo": body
         }
-        if data:
-            payload.update({k: str(v) for k, v in data.items()})
+        payload.update({k: str(v) for k, v in data.items()})
 
+        # Al agregar 'notification', Firebase forzará la visualización en la bandeja del sistema
+        # si la app está en segundo plano o cerrada. Si está abierta, gatilla onMessageReceived.
         message = messaging.MulticastMessage(
             tokens=fcm_tokens,
+            notification=messaging.Notification(
+                title=title,
+                body=body
+            ),
             data=payload,
             android=messaging.AndroidConfig(priority="high")
         )
