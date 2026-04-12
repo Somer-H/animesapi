@@ -9,3 +9,8 @@ __pypackages__/
 env/
 venv/
 ENV/
+
+# Firebase & Keys
+*.json
+!global-bundle.pem
+firebase-key.json

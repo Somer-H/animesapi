@@ -22,6 +22,7 @@ class AnimeService:
             año=anime_create.año,
             descripcion=anime_create.descripcion,
             image_url=anime_create.image_url,
+            tags=anime_create.tags or "",
             user_id=user_id
         )
     

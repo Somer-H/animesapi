@@ -5,6 +5,8 @@ from anime.schemas import AnimeCreate, AnimeUpdate, AnimeResponse
 from anime.service import AnimeService
 from security.auth import verify_token
 import cloudinary.uploader
+from tags.repository import TagRepository
+from tags.notifications import send_push_notification
 
 
 router = APIRouter(prefix="/api/animes", tags=["animes"])
@@ -18,7 +20,22 @@ def create_anime(
 ):
     user_id = int(payload.get("sub"))
     print(f"[CREATE] user_id from token: {user_id} (type: {type(user_id)})") 
-    return AnimeService.create_anime(db, anime_create, user_id)
+    anime = AnimeService.create_anime(db, anime_create, user_id)
+
+    # Disparar notificaciones a usuarios suscritos a los tags del nuevo anime
+    if anime.tags:
+        tags_list = [t.strip() for t in anime.tags.split(",") if t.strip()]
+        if tags_list:
+            tokens = TagRepository.get_fcm_tokens_for_tags(db, tags_list)
+            if tokens:
+                send_push_notification(
+                    fcm_tokens=tokens,
+                    title=f"🎬 Nuevo anime: {anime.titulo}",
+                    body=f"Tags: {', '.join(tags_list)}",
+                    data={"anime_id": anime.id, "titulo": anime.titulo}
+                )
+
+    return anime
 
 
 @router.get("/{anime_id}", response_model=AnimeResponse)

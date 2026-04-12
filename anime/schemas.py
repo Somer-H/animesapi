@@ -9,6 +9,7 @@ class AnimeCreate(BaseModel):
     año: int
     descripcion: str
     image_url: Optional[str] = None
+    tags: Optional[str] = ""  # Tags separados por coma: "accion,romance,comedia"
 
 
 class AnimeUpdate(BaseModel):
@@ -17,6 +18,7 @@ class AnimeUpdate(BaseModel):
     año: int = None
     descripcion: str = None
     image_url: Optional[str] = None
+    tags: Optional[str] = None  # Tags separados por coma
 
 
 class AnimeResponse(BaseModel):
@@ -26,6 +28,7 @@ class AnimeResponse(BaseModel):
     año: int
     descripcion: str
     image_url: Optional[str]
+    tags: Optional[str] = ""
     user_id: int
     created_at: datetime
     

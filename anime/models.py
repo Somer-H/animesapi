@@ -13,6 +13,8 @@ class Anime(Base):
     año = Column(Integer, nullable=False)
     descripcion = Column(String(500), nullable=False)
     image_url = Column(String(500), nullable=True)
+    # Tags separados por coma: "accion,romance,comedia"
+    tags = Column(String(500), nullable=True, default="")
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
