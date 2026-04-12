@@ -16,7 +16,8 @@ def create_anime(
     db: Session = Depends(get_db),
     payload: dict = Depends(verify_token)
 ):
-    user_id = payload.get("sub")
+    user_id = int(payload.get("sub"))
+    print(f"[CREATE] user_id from token: {user_id} (type: {type(user_id)})") 
     return AnimeService.create_anime(db, anime_create, user_id)
 
 
@@ -46,10 +47,10 @@ def update_anime(
     db: Session = Depends(get_db),
     payload: dict = Depends(verify_token)
 ):
-    user_id = payload.get("sub")
+    user_id = int(payload.get("sub"))
     anime = AnimeService.get_anime_by_id(db, anime_id)
     
-    if anime.user_id != user_id:
+    if int(anime.user_id) != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No tienes permiso para editar este anime"
@@ -64,10 +65,10 @@ def delete_anime(
     db: Session = Depends(get_db),
     payload: dict = Depends(verify_token)
 ):
-    user_id = payload.get("sub")
+    user_id = int(payload.get("sub"))
     anime = AnimeService.get_anime_by_id(db, anime_id)
     
-    if anime.user_id != user_id:
+    if int(anime.user_id) != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No tienes permiso para eliminar este anime"
@@ -83,11 +84,13 @@ def upload_anime_image(
     db: Session = Depends(get_db),
     payload: dict = Depends(verify_token)
 ):
-    user_id = payload.get("sub")
+    user_id = int(payload.get("sub"))
     # Obtener el anime para verificar que existe y es el dueño
     anime = AnimeService.get_anime_by_id(db, anime_id)
     
-    if anime.user_id != user_id:
+    print(f"[UPLOAD] anime.user_id: {anime.user_id} (type: {type(anime.user_id)}) | token user_id: {user_id} (type: {type(user_id)})")
+    
+    if int(anime.user_id) != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No tienes permiso para subir imágenes a este anime"

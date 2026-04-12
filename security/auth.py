@@ -37,12 +37,21 @@ def verify_token(credentials = Depends(security)) -> dict:
     
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: Optional[int] = payload.get("sub")
+        user_id_raw = payload.get("sub")
         
-        if user_id is None:
+        if user_id_raw is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token inválido"
+            )
+            
+        try:
+            user_id = int(user_id_raw)
+            payload["sub"] = user_id
+        except (ValueError, TypeError):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="ID de usuario inválido en el token"
             )
         
         return payload
