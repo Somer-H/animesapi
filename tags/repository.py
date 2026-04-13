@@ -53,12 +53,17 @@ class TagRepository:
         return [s.tag for s in subs]
 
     @staticmethod
-    def get_fcm_tokens_for_tags(db: Session, tags: list[str]) -> list[str]:
+    def get_fcm_tokens_for_tags(db: Session, tags: list[str], exclude_user_id: int = None) -> list[str]:
         """Dado un conjunto de tags, devuelve todos los fcm_tokens de usuarios suscritos."""
         normalized = [t.lower().strip() for t in tags]
-        subs = db.query(UserTagSubscription).filter(
+        query = db.query(UserTagSubscription).filter(
             UserTagSubscription.tag.in_(normalized),
             UserTagSubscription.fcm_token.isnot(None)
-        ).all()
+        )
+        
+        if exclude_user_id is not None:
+            query = query.filter(UserTagSubscription.user_id != exclude_user_id)
+            
+        subs = query.all()
         # Evitar duplicados si un usuario está suscrito a varios tags del anime
         return list({s.fcm_token for s in subs})

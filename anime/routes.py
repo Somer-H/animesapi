@@ -26,8 +26,8 @@ def create_anime(
     if anime.tags:
         try:
             tags_list = [t.strip().lower() for t in anime.tags.split(",") if t.strip()]
-            print(f"DEBUG: Buscando tokens para tags: {tags_list}")
-            tokens = TagRepository.get_fcm_tokens_for_tags(db, tags_list)
+            print(f"DEBUG: Buscando tokens para tags: {tags_list} excluyendo autor: {user_id}")
+            tokens = TagRepository.get_fcm_tokens_for_tags(db, tags_list, exclude_user_id=user_id)
             print(f"DEBUG: Tokens encontrados: {len(tokens)}")
             
             if tokens:
