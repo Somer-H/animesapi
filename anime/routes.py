@@ -66,7 +66,7 @@ def get_anime(
 def get_all_animes(
     db: Session = Depends(get_db),
     skip: int = 0,
-    limit: int = 10,
+    limit: int = 1000,
     payload: dict = Depends(verify_token)
 ):
     return AnimeService.get_all_animes(db, skip, limit)

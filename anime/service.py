@@ -39,7 +39,7 @@ class AnimeService:
         return anime
     
     @staticmethod
-    def get_all_animes(db: Session, skip: int = 0, limit: int = 10):
+    def get_all_animes(db: Session, skip: int = 0, limit: int = 1000):
         return AnimeRepository.get_all(db, skip, limit)
     
     @staticmethod

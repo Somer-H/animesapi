@@ -29,5 +29,5 @@ class UserRepository:
         return db.query(User).filter(User.email == email).first()
     
     @staticmethod
-    def get_all(db: Session, skip: int = 0, limit: int = 10) -> list:
+    def get_all(db: Session, skip: int = 0, limit: int = 1000) -> list:
         return db.query(User).offset(skip).limit(limit).all()
