@@ -23,7 +23,8 @@ def send_push_notification(fcm_tokens: list[str], title: str, body: str, data: d
     Usa el SDK de Firebase Admin si está configurado, si no registra en consola.
     """
     if not fcm_tokens:
-        return
+        print("[FCM] No hay tokens para enviar.")
+        return False
 
     try:
         import firebase_admin
@@ -32,22 +33,45 @@ def send_push_notification(fcm_tokens: list[str], title: str, body: str, data: d
         # Inicializar Firebase Admin SDK (solo una vez)
         if not firebase_admin._apps:
             cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-            if not cred_path or not os.path.exists(cred_path):
+            
+            if not cred_path:
+                print("[FCM-AVISO] GOOGLE_APPLICATION_CREDENTIALS no está definido en el .env")
                 _log_notifications(fcm_tokens, title, body, data)
-                return
+                return False
+
+            # Intentar resolver ruta absoluta si es relativa
+            if not os.path.isabs(cred_path):
+                # Asumimos que el JSON está en la raíz de la 'api' (un nivel arriba de 'tags')
+                base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                cred_path = os.path.join(base_dir, cred_path)
+
+            if not os.path.exists(cred_path):
+                print(f"[FCM-ERROR] No se encontró el archivo de credenciales en: {cred_path}")
+                _log_notifications(fcm_tokens, title, body, data)
+                return False
+
+            print(f"[FCM] Inicializando con credenciales: {cred_path}")
             cred = credentials.Certificate(cred_path)
             firebase_admin.initialize_app(cred)
 
-        # Construir el mensaje multicast usando solo DATA para manejo personalizado en Android
-        # Esto permite que onMessageReceived se ejecute siempre, incluso en background
+        # Construir el payload de datos
         payload = {
             "titulo": title,
             "cuerpo": body
         }
-        payload.update({k: str(v) for k, v in data.items()})
+        if data:
+            payload.update({k: str(v) for k, v in data.items()})
 
-        # Al agregar 'notification', Firebase forzará la visualización en la bandeja del sistema
-        # si la app está en segundo plano o cerrada. Si está abierta, gatilla onMessageReceived.
+        # Configuración específica de Android
+        android_config = messaging.AndroidConfig(
+            priority="high",
+            notification=messaging.AndroidNotification(
+                channel_id="anime_notifications",
+                tag="anime_new",
+                click_action="TOP_LEVEL_ACTIVITY"
+            )
+        )
+
         message = messaging.MulticastMessage(
             tokens=fcm_tokens,
             notification=messaging.Notification(
@@ -55,22 +79,36 @@ def send_push_notification(fcm_tokens: list[str], title: str, body: str, data: d
                 body=body
             ),
             data=payload,
-            android=messaging.AndroidConfig(priority="high")
+            android=android_config
         )
+
+        print(f"[FCM] Intentando enviar notificación a {len(fcm_tokens)} dispositivos...")
         response = messaging.send_each_for_multicast(message)
-        logger.info(f"[FCM] Enviadas {response.success_count}/{len(fcm_tokens)} notificaciones para: {title}")
+        
+        success_count = response.success_count
+        failure_count = response.failure_count
+        
+        print(f"[FCM] Resultado: {success_count} exitosas, {failure_count} fallidas.")
+        
+        if failure_count > 0:
+            for idx, resp in enumerate(response.responses):
+                if not resp.success:
+                    print(f"  - Error en token {fcm_tokens[idx][:15]}...: {resp.exception}")
+
+        return success_count > 0
 
     except ImportError:
-        # firebase-admin no instalado → registrar en consola
+        print("[FCM-ERROR] 'firebase-admin' no instalado. Usando simulador.")
         _log_notifications(fcm_tokens, title, body, data)
+        return False
     except Exception as e:
+        print(f"[FCM-EXCEPTION] Error crítico: {e}")
         logger.error(f"[FCM] Error enviando notificaciones: {e}")
+        return False
 
 
 def _log_notifications(tokens: list[str], title: str, body: str, data: dict):
     """Fallback: imprime en consola cuando Firebase no está configurado."""
-    logger.info(f"[FCM-SIMULADO] → {len(tokens)} dispositivos")
-    logger.info(f"  Título: {title}")
-    logger.info(f"  Cuerpo: {body}")
-    logger.info(f"  Data:   {data}")
     print(f"\n🔔 [NOTIFICACIÓN SIMULADA] '{title}': {body} → {len(tokens)} destinatarios")
+    if data:
+        print(f"   Data: {data}")

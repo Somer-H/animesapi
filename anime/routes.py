@@ -22,24 +22,29 @@ def create_anime(
     print(f"[CREATE] user_id from token: {user_id} (type: {type(user_id)})") 
     anime = AnimeService.create_anime(db, anime_create, user_id)
 
-    # Disparar    # 2. Notificar a usuarios interesados via FCM (basado en tags)
+    # 2. Notificar a usuarios interesados via FCM (basado en tags)
     if anime.tags:
         try:
             tags_list = [t.strip().lower() for t in anime.tags.split(",") if t.strip()]
             print(f"DEBUG: Buscando tokens para tags: {tags_list}")
             tokens = TagRepository.get_fcm_tokens_for_tags(db, tags_list)
             print(f"DEBUG: Tokens encontrados: {len(tokens)}")
+            
             if tokens:
-                from tags.notifications import send_push_notification
-                send_push_notification(
+                success = send_push_notification(
                     fcm_tokens=tokens,
                     title="Nuevo Anime publicado",
                     body=f"¡Se ha publicado '{anime.titulo}' que coincide con tus intereses!",
                     data={"anime_id": anime.id}
                 )
-                print("DEBUG: Notificaciones enviadas exitosamente")
+                if success:
+                    print("DEBUG: Notificaciones enviadas exitosamente vía Firebase.")
+                else:
+                    print("DEBUG: Hubo problemas al enviar las notificaciones (revisa logs de FCM arriba).")
+            else:
+                print("DEBUG: No se encontraron usuarios suscritos a estos tags.")
         except Exception as e:
-            print(f"ERROR enviando notificaciones: {e}")
+            print(f"ERROR en el disparador de notificaciones: {e}")
 
     return anime
 
