@@ -44,6 +44,15 @@ class AnimeRepository:
         return anime
     
     @staticmethod
+    def like(db: Session, anime_id: int) -> Anime:
+        anime = db.query(Anime).filter(Anime.id == anime_id).first()
+        if anime:
+            anime.likes += 1
+            db.commit()
+            db.refresh(anime)
+        return anime
+    
+    @staticmethod
     def delete(db: Session, anime_id: int) -> bool:
         anime = db.query(Anime).filter(Anime.id == anime_id).first()
         if anime:

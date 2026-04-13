@@ -29,6 +29,7 @@ class AnimeResponse(BaseModel):
     descripcion: str
     image_url: Optional[str]
     tags: Optional[str] = ""
+    likes: int = 0
     user_id: int
     created_at: datetime
     

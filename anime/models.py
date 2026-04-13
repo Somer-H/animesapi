@@ -15,6 +15,7 @@ class Anime(Base):
     image_url = Column(String(500), nullable=True)
     # Tags separados por coma: "accion,romance,comedia"
     tags = Column(String(500), nullable=True, default="")
+    likes = Column(Integer, default=0)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 

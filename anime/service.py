@@ -56,6 +56,16 @@ class AnimeService:
         return AnimeRepository.update(db, anime_id, **update_data)
     
     @staticmethod
+    def like_anime(db: Session, anime_id: int):
+        anime = AnimeRepository.like(db, anime_id)
+        if not anime:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Anime no encontrado"
+            )
+        return anime
+    
+    @staticmethod
     def delete_anime(db: Session, anime_id: int):
         success = AnimeRepository.delete(db, anime_id)
         

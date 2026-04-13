@@ -135,3 +135,32 @@ def upload_anime_image(
     # Actualizar la base de datos
     anime_update = AnimeUpdate(image_url=image_url)
     return AnimeService.update_anime(db, anime_id, anime_update)
+
+
+@router.post("/{anime_id}/like", response_model=AnimeResponse)
+def like_anime(
+    anime_id: int,
+    db: Session = Depends(get_db),
+    payload: dict = Depends(verify_token)
+):
+    user_id_liking = int(payload.get("sub"))
+    anime = AnimeService.like_anime(db, anime_id)
+    
+    # 2. Notificar al dueño del anime (si no es quien le dio like)
+    if int(anime.user_id) != user_id_liking:
+        try:
+            tokens = TagRepository.get_fcm_tokens_for_user(db, anime.user_id)
+            if tokens:
+                send_push_notification(
+                    fcm_tokens=tokens,
+                    title="¡Nuevo Like!",
+                    body=f"A alguien le gustó tu anime: {anime.titulo}",
+                    data={
+                        "anime_id": anime.id,
+                        "type": "like"
+                    }
+                )
+        except Exception as e:
+            print(f"ERROR enviando notificación de like: {e}")
+            
+    return anime
