@@ -34,8 +34,12 @@ def create_anime(
                 success = send_push_notification(
                     fcm_tokens=tokens,
                     title="Nuevo Anime publicado",
-                    body=f"¡Se ha publicado '{anime.titulo}' que coincide con tus intereses!",
-                    data={"anime_id": anime.id}
+                    body=f"¡Se ha publicado '{anime.titulo}'!",
+                    data={
+                        "anime_id": anime.id,
+                        "tags": anime.tags,
+                        "actions": "view,dismiss"
+                    }
                 )
                 if success:
                     print("DEBUG: Notificaciones enviadas exitosamente vía Firebase.")

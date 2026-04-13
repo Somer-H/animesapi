@@ -54,30 +54,22 @@ def send_push_notification(fcm_tokens: list[str], title: str, body: str, data: d
             cred = credentials.Certificate(cred_path)
             firebase_admin.initialize_app(cred)
 
-        # Construir el payload de datos
+        # Construir el payload de datos (Solo Data Message)
+        # Esto permite que la App maneje la notificación en onMessageReceived
         payload = {
-            "titulo": title,
-            "cuerpo": body
+            "title": title,
+            "body": body
         }
         if data:
             payload.update({k: str(v) for k, v in data.items()})
 
-        # Configuración específica de Android
+        # Configuración específica de Android (Prioridad alta para entrega inmediata)
         android_config = messaging.AndroidConfig(
-            priority="high",
-            notification=messaging.AndroidNotification(
-                channel_id="anime_notifications",
-                tag="anime_new",
-                click_action="TOP_LEVEL_ACTIVITY"
-            )
+            priority="high"
         )
 
         message = messaging.MulticastMessage(
             tokens=fcm_tokens,
-            notification=messaging.Notification(
-                title=title,
-                body=body
-            ),
             data=payload,
             android=android_config
         )
